@@ -990,7 +990,7 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold uppercase tracking-wide text-gray-600 mb-1">Phone</p>
-                    <a href="tel:+923238513549" className="text-gray-900 hover:text-teal-600 transition-colors font-medium">+92 323 8513549</a>
+                    <a href="tel:+923335515445" className="text-gray-900 hover:text-teal-600 transition-colors font-medium">+92 333 5515445</a>
                   </div>
                 </div>
                 
@@ -1237,7 +1237,7 @@ export default function Home() {
 
       {/* Floating WhatsApp Button */}
       <a
-        href="https://wa.me/923238513549"
+        href="https://wa.me/923335515445"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 left-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg transition-colors"
