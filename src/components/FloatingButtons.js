@@ -26,7 +26,7 @@ export default function FloatingButtons() {
   }, []);
   
   // Format phone number for WhatsApp link
-  const whatsappNumber = "+923238513549";
+  const whatsappNumber = "+923335515445";
   const whatsappLink = `https://wa.me/${whatsappNumber.replace(/\+/g, '')}`;
   
   return (
