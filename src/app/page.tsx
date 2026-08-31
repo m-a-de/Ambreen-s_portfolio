@@ -6,6 +6,87 @@ import Image from 'next/image';
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    enquiryType: 'general',
+    message: '',
+    privacy: false,
+    website: '',
+  });
+  const [contactStatus, setContactStatus] = useState({
+    submitted: false,
+    success: false,
+    message: '',
+  });
+  const [isSending, setIsSending] = useState(false);
+
+  const handleContactChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type } = e.target;
+    const checked = type === 'checkbox' && 'checked' in e.target ? e.target.checked : false;
+    setContactForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!contactForm.name || !contactForm.email || !contactForm.message || !contactForm.privacy) {
+      setContactStatus({
+        submitted: true,
+        success: false,
+        message: 'Please fill out all required fields and agree to the privacy statement.',
+      });
+      return;
+    }
+
+    setIsSending(true);
+    setContactStatus({ submitted: false, success: false, message: '' });
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contactForm),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Unable to send your message. Please try again later.');
+      }
+
+      setContactStatus({
+        submitted: true,
+        success: true,
+        message: 'Thank you for reaching out. I will respond to your message within 24-48 hours.',
+      });
+      setContactForm({
+        name: '',
+        email: '',
+        phone: '',
+        enquiryType: 'general',
+        message: '',
+        privacy: false,
+        website: '',
+      });
+    } catch (error) {
+      setContactStatus({
+        submitted: true,
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Unable to send your message. Please try again later.',
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -963,7 +1044,30 @@ export default function Home() {
             {/* Contact Form */}
             <div className="bg-gradient-to-br from-white to-teal-50/30 rounded-2xl p-8 shadow-lg border border-teal-100">
               <h3 className="text-2xl md:text-3xl font-serif font-semibold text-gray-900 mb-6">Send Me a Message</h3>
-              <form className="space-y-5">
+              <form className="space-y-5" onSubmit={handleContactSubmit} noValidate>
+                {contactStatus.submitted && (
+                  <div
+                    className={`p-4 rounded-xl ${
+                      contactStatus.success
+                        ? 'bg-green-50 text-green-800 border border-green-200'
+                        : 'bg-red-50 text-red-800 border border-red-200'
+                    }`}
+                  >
+                    {contactStatus.message}
+                  </div>
+                )}
+                <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+                  <label htmlFor="website">Website</label>
+                  <input
+                    type="text"
+                    id="website"
+                    name="website"
+                    value={contactForm.website}
+                    onChange={handleContactChange}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
                 <div>
                   <label htmlFor="name" className="block text-sm font-semibold text-gray-900 mb-2">
                     Name <span className="text-red-500">*</span>
@@ -971,6 +1075,9 @@ export default function Home() {
                   <input
                     type="text"
                     id="name"
+                    name="name"
+                    value={contactForm.name}
+                    onChange={handleContactChange}
                     required
                     className="w-full px-4 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all bg-white hover:border-teal-300"
                     placeholder="Your full name"
@@ -983,6 +1090,9 @@ export default function Home() {
                   <input
                     type="email"
                     id="email"
+                    name="email"
+                    value={contactForm.email}
+                    onChange={handleContactChange}
                     required
                     className="w-full px-4 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all bg-white hover:border-teal-300"
                     placeholder="your@email.com"
@@ -995,6 +1105,9 @@ export default function Home() {
                   <input
                     type="tel"
                     id="phone"
+                    name="phone"
+                    value={contactForm.phone}
+                    onChange={handleContactChange}
                     className="w-full px-4 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all bg-white hover:border-teal-300"
                     placeholder="+92 ..."
                   />
@@ -1005,12 +1118,15 @@ export default function Home() {
                   </label>
                   <select
                     id="enquiry"
+                    name="enquiryType"
+                    value={contactForm.enquiryType}
+                    onChange={handleContactChange}
                     className="w-full px-4 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all bg-white hover:border-teal-300"
                   >
-                    <option>General Enquiry</option>
-                    <option>Individual Therapy</option>
-                    <option>Couples Therapy</option>
-                    <option>Assessment &amp; Consultation</option>
+                    <option value="general">General Enquiry</option>
+                    <option value="individual">Individual Therapy</option>
+                    <option value="couples">Couples Therapy</option>
+                    <option value="assessment">Assessment &amp; Consultation</option>
                   </select>
                 </div>
                 <div>
@@ -1019,6 +1135,9 @@ export default function Home() {
                   </label>
                   <textarea
                     id="message"
+                    name="message"
+                    value={contactForm.message}
+                    onChange={handleContactChange}
                     required
                     rows={6}
                     className="w-full px-4 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all resize-none bg-white hover:border-teal-300"
@@ -1029,6 +1148,9 @@ export default function Home() {
                   <input
                     type="checkbox"
                     id="privacy"
+                    name="privacy"
+                    checked={contactForm.privacy}
+                    onChange={handleContactChange}
                     required
                     className="mt-1 w-5 h-5 text-teal-500 border-gray-300 rounded focus:ring-teal-500 cursor-pointer"
                   />
@@ -1038,9 +1160,10 @@ export default function Home() {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-teal-500 hover:bg-teal-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] uppercase tracking-wide"
+                  disabled={isSending}
+                  className="w-full bg-teal-500 hover:bg-teal-600 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] uppercase tracking-wide disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  Book Now
+                  {isSending ? 'Sending...' : 'Book Now'}
                 </button>
                 <p className="text-xs text-gray-500 text-center leading-relaxed">
                   Your privacy is important to me. All information shared will be kept confidential in accordance with ethical guidelines.

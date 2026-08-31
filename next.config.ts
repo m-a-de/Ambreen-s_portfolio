@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export",
   images: {
     // Allow Unsplash assets used across the page
     remotePatterns: [
@@ -10,8 +9,6 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
       },
     ],
-    // Needed for fully static exports
-    unoptimized: true,
   },
 };
 

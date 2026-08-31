@@ -10,6 +10,7 @@ export default function Contact() {
     enquiryType: 'general', // Default value
     message: '',
     privacy: false,
+    website: '',
   });
   
   const [formStatus, setFormStatus] = useState({
@@ -17,6 +18,7 @@ export default function Contact() {
     success: false,
     message: '',
   });
+  const [isSending, setIsSending] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -26,10 +28,9 @@ export default function Contact() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate form
     if (!formData.name || !formData.email || !formData.message || !formData.privacy) {
       setFormStatus({
         submitted: true,
@@ -38,19 +39,35 @@ export default function Contact() {
       });
       return;
     }
-    
-    // Here you would normally send the data to your backend or email service
-    // For now, we'll just simulate a successful submission
-    
-    // Simulate API call
-    setTimeout(() => {
+
+    setIsSending(true);
+    setFormStatus({
+      submitted: false,
+      success: false,
+      message: '',
+    });
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Unable to send your message. Please try again later.');
+      }
+
       setFormStatus({
         submitted: true,
         success: true,
         message: 'Thank you for reaching out. I will respond to your message within 24-48 hours.',
       });
-      
-      // Reset form
+
       setFormData({
         name: '',
         email: '',
@@ -58,17 +75,19 @@ export default function Contact() {
         enquiryType: 'general',
         message: '',
         privacy: false,
+        website: '',
       });
-      
-      // Reset form status after 5 seconds
-      setTimeout(() => {
-        setFormStatus({
-          submitted: false,
-          success: false,
-          message: '',
-        });
-      }, 5000);
-    }, 1500);
+    } catch (error) {
+      setFormStatus({
+        submitted: true,
+        success: false,
+        message: error instanceof Error && error.message
+          ? error.message
+          : 'Unable to send your message. Please try again later.',
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -94,7 +113,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-700 text-sm">Email</p>
-                  <p className="text-gray-900">contact@ambreenrashidkhan.com</p>
+                  <p className="text-gray-900">consult@ambreenrashidkhan.com</p>
                 </div>
               </div>
               
@@ -162,7 +181,7 @@ export default function Contact() {
           <div className="lg:col-span-7 p-8 animate-slide-left">
             <h3 className="text-xl font-medium mb-6">Send Me a Message</h3>
             
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               {formStatus.submitted && (
                 <div className={`mb-6 p-4 rounded-md ${formStatus.success ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
                   {formStatus.message}
@@ -195,6 +214,19 @@ export default function Contact() {
                     required 
                   />
                 </div>
+              </div>
+
+              <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+                <label htmlFor="website">Website</label>
+                <input
+                  type="text"
+                  id="website"
+                  name="website"
+                  value={formData.website}
+                  onChange={handleChange}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -262,10 +294,11 @@ export default function Contact() {
               </div>
               
               <button 
-                type="submit" 
-                className="w-full bg-primary text-white font-medium py-2.5 px-4 rounded-md hover:bg-primary-dark transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                type="submit"
+                disabled={isSending}
+                className="w-full bg-primary text-white font-medium py-2.5 px-4 rounded-md hover:bg-primary-dark transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Send Message
+                {isSending ? 'Sending...' : 'Send Message'}
               </button>
               
               <p className="text-xs text-gray-500 mt-4 text-center">Your privacy is important to me. All information shared will be kept confidential in accordance with ethical guidelines.</p>
