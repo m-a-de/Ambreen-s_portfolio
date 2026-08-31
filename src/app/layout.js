@@ -1,4 +1,5 @@
 import { DM_Serif_Display, Inter } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 const dmSerif = DM_Serif_Display({
@@ -13,11 +14,9 @@ const inter = Inter({
 });
 
 export const metadata = {
-  verification: {
-    google: "wA83WgRPghu40_a8j-KC6lIDv29FIIi8EPWHEjHC4-M",
-  },
   title: "Ambreen Rashid Khan - Clinical Psychologist",
-  description: "Professional psychology services - helping you rediscover balance, clarity, and self-compassion",
+  description:
+    "Professional psychology services - helping you rediscover balance, clarity, and self-compassion",
 };
 
 export default function RootLayout({ children }) {
@@ -28,6 +27,8 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
       >
         {children}
+
+        <GoogleAnalytics gaId="G-0PE7FFMVGP" />
       </body>
     </html>
   );

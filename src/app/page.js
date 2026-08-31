@@ -11,7 +11,6 @@ import FloatingButtons from '../components/FloatingButtons';
 export default function Home() {
   return (
     <main>
-    <head><meta name="google-site-verification" content="wA83WgRPghu40_a8j-KC6lIDv29FIIi8EPWHEjHC4-M" /></>
       <Header />
       <Hero />
       <About />

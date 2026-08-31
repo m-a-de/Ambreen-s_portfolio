@@ -1,16 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 export default function Footer() {
-  // Use a state for the year to avoid hydration mismatch
-  const [currentYear, setCurrentYear] = useState('2024');
-  
-  // Set the year only on client side
-  useEffect(() => {
-    setCurrentYear(new Date().getFullYear().toString());
-  }, []);
-  
+  const currentYear = new Date().getFullYear();
+
   // Smooth scroll function
   const scrollToSection = useCallback((sectionId, event) => {
     if (event) event.preventDefault();
