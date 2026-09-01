@@ -1208,7 +1208,7 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">Contact</h4>
               <ul className="space-y-2 text-sm text-teal-100">
-                <li>+92 323 8513549</li>
+                <li>+92 333 5515445</li>
                 <li>Shadman 2, Lahore, Pakistan</li>
               </ul>
             </div>
