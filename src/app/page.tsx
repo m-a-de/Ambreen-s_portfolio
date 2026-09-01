@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -21,6 +22,9 @@ export default function Home() {
     message: '',
   });
   const [isSending, setIsSending] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef<TurnstileInstance | null>(null);
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   const handleContactChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -45,6 +49,15 @@ export default function Home() {
       return;
     }
 
+    if (!turnstileToken) {
+      setContactStatus({
+        submitted: true,
+        success: false,
+        message: 'Please complete the human verification before submitting.',
+      });
+      return;
+    }
+
     setIsSending(true);
     setContactStatus({ submitted: false, success: false, message: '' });
 
@@ -52,7 +65,7 @@ export default function Home() {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(contactForm),
+        body: JSON.stringify({ ...contactForm, turnstileToken }),
       });
       const data = await response.json().catch(() => ({}));
 
@@ -74,6 +87,8 @@ export default function Home() {
         privacy: false,
         website: '',
       });
+      setTurnstileToken('');
+      turnstileRef.current?.reset();
     } catch (error) {
       setContactStatus({
         submitted: true,
@@ -1158,6 +1173,13 @@ export default function Home() {
                     I understand that my information will be treated confidentially and securely in accordance with professional standards.
                   </label>
                 </div>
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={turnstileSiteKey || ''}
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  onExpire={() => setTurnstileToken('')}
+                  onError={() => setTurnstileToken('')}
+                />
                 <button
                   type="submit"
                   disabled={isSending}

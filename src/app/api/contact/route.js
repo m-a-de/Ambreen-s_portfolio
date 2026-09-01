@@ -40,9 +40,39 @@ export async function POST(request) {
     const message = typeof body.message === "string" ? body.message.trim() : "";
     const honeypot =
       typeof body.website === "string" ? body.website.trim() : "";
+    const turnstileToken =
+      typeof body.turnstileToken === "string" ? body.turnstileToken.trim() : "";
 
     if (honeypot) {
       return NextResponse.json({ ok: true });
+    }
+
+    const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+    if (!turnstileToken || !turnstileSecret) {
+      return NextResponse.json(
+        { error: "Human verification failed. Please try again." },
+        { status: 400 }
+      );
+    }
+
+    const turnstileVerifyResponse = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          secret: turnstileSecret,
+          response: turnstileToken,
+        }),
+      }
+    );
+    const turnstileResult = await turnstileVerifyResponse.json().catch(() => ({}));
+
+    if (turnstileResult.success !== true) {
+      return NextResponse.json(
+        { error: "Human verification failed. Please try again." },
+        { status: 400 }
+      );
     }
 
     if (!name || !email || !message || !isTruthyPrivacy(body.privacy)) {
