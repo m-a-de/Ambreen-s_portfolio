@@ -211,15 +211,18 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
         {/* Background Image with Fallback */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-gradient-to-br from-teal-900 via-teal-800 to-teal-700"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=2070&auto=format&fit=crop')`
-          }}
-        >
-          {/* Teal Overlay - Matching site color scheme */}
-          <div className="absolute inset-0 bg-teal-900/60"></div>
-        </div>
+        <div className="absolute inset-0">
+  <Image
+    src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=75&w=1600&auto=format&fit=crop"
+    alt=""
+    fill
+    priority
+    fetchPriority="high"
+    sizes="100vw"
+    className="object-cover object-center"
+  />
+  <div className="absolute inset-0 bg-teal-900/60"></div>
+</div>
         
         {/* Content */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-32 pb-16">
