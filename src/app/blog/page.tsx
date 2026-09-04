@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: 'Insights & Resources | Ambreen Rashid Khan',
   description:
     'Mental health, relationships, therapy and personal growth resources from Ambreen Rashid Khan, Clinical Psychologist in Lahore.',
+  alternates: {
+    canonical: '/blog',
+  },
 };
 
 export default function BlogPage() {

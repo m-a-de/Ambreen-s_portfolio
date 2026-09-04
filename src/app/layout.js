@@ -1,5 +1,7 @@
 import { DM_Serif_Display, Inter } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import BackToTop from "../components/BackToTop";
+import SmoothScroll from "../components/SmoothScroll";
 import "./globals.css";
 
 const dmSerif = DM_Serif_Display({
@@ -14,9 +16,25 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Ambreen Rashid Khan - Clinical Psychologist",
+  metadataBase: new URL("https://www.ambreenrashidkhan.com"),
+
+  title: "Clinical Psychologist in Lahore | Ambreen Rashid Khan",
+
   description:
-    "Professional psychology services - helping you rediscover balance, clarity, and self-compassion",
+    "Ambreen Rashid Khan is a clinical psychologist in Lahore offering compassionate, evidence-based therapy for anxiety, depression, trauma, relationships and personal growth.",
+
+  alternates: {
+    canonical: "/",
+  },
+
+  openGraph: {
+    title: "Clinical Psychologist in Lahore | Ambreen Rashid Khan",
+    description:
+      "Compassionate, evidence-based therapy for anxiety, depression, trauma, relationships and personal growth.",
+    url: "https://www.ambreenrashidkhan.com",
+    siteName: "Ambreen Rashid Khan",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -28,6 +46,8 @@ export default function RootLayout({ children }) {
       >
         {children}
 
+        <SmoothScroll />
+        <BackToTop />
         <GoogleAnalytics gaId="G-0PE7FFMVGP" />
       </body>
     </html>
