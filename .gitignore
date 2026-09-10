@@ -40,3 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 content-source/
+
+# tina (local CMS only — do not deploy)
+tina/__generated__/
+public/admin/
