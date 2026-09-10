@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "predev:cms": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/cleanup-cms-dev.ps1",
     "dev:cms": "tinacms dev -c \"next dev\"",
+    "cms:stop": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/cleanup-cms-dev.ps1",
     "build": "next build",
     "export": "next export",
     "start": "next start",
