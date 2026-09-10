@@ -1,13 +1,13 @@
 ---
-title: "Trauma Therapy in Lahore: How Past Experiences Can Affect Your Present Life"
-seoTitle: "Trauma Therapy in Lahore: Understanding Trauma and PTSD"
-description: "Looking for trauma therapy in Lahore? Learn how trauma can affect emotions, relationships and daily life, what PTSD can look like, and how therapy may help."
-date: "2026-09-04"
-category: "Trauma"
-image: "/images/blog/trauma-therapy-lahore.webp"
-author: "Ambreen Rashid Khan"
-status: "draft"
-primaryKeyword: "trauma therapy Lahore"
+title: 'Trauma Therapy in Lahore: How Past Experiences Can Affect Your Present Life'
+image: '/images/blog/trauma-therapy-lahore.webp'
+status: published
+date: 2026-09-04T00:00:00.000Z
+category: Trauma
+author: Ambreen Rashid Khan
+seoTitle: 'Trauma Therapy in Lahore: Understanding Trauma and PTSD'
+description: 'Looking for trauma therapy in Lahore? Learn how trauma can affect emotions, relationships and daily life, what PTSD can look like, and how therapy may help.'
+primaryKeyword: trauma therapy Lahore
 ---
 
 A difficult experience can end while its emotional effects continue.
@@ -102,6 +102,6 @@ If something from your past continues influencing your emotions, relationships, 
 
 ## Ready to take the next step?
 
-Visit www.ambreenrashidkhan.com to learn about in-person and online psychological therapy options.
+Visit [www.ambreenrashidkhan.com](http://www.ambreenrashidkhan.com) to learn about in-person and online psychological therapy options.
 
 This article provides general educational information and should not be used to diagnose PTSD or any other psychological condition.

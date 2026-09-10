@@ -1,13 +1,13 @@
 ---
-title: "Depression Therapy in Lahore: Understanding the Signs and When to Seek Help"
-seoTitle: "Depression Therapy in Lahore: Signs You Should Not Ignore"
-description: "Learn common signs of depression and when to seek professional support. Find out how depression therapy in Lahore can help you understand what you are experiencing."
-date: "2026-09-04"
-category: "Depression"
-image: "/images/blog/depression-therapy-lahore.webp"
-author: "Ambreen Rashid Khan"
-status: "draft"
-primaryKeyword: "depression therapy Lahore"
+title: 'Depression Therapy in Lahore: Understanding the Signs and When to Seek Help'
+image: '/images/blog/depression-therapy-lahore.webp'
+status: published
+date: 2026-09-04T00:00:00.000Z
+category: Depression
+author: Ambreen Rashid Khan
+seoTitle: 'Depression Therapy in Lahore: Signs You Should Not Ignore'
+description: Learn common signs of depression and when to seek professional support. Find out how depression therapy in Lahore can help you understand what you are experiencing.
+primaryKeyword: depression therapy Lahore
 ---
 
 Everyone experiences sadness.
@@ -100,6 +100,6 @@ Seeking therapy does not mean that you have given up. It can mean that you have 
 
 ## Ready to take the next step?
 
-Visit www.ambreenrashidkhan.com to learn about in-person and online psychological therapy options.
+Visit [www.ambreenrashidkhan.com](http://www.ambreenrashidkhan.com) to learn about in-person and online psychological therapy options.
 
 This article is educational and is not a diagnosis or substitute for individual mental health or medical care.

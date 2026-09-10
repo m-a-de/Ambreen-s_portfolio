@@ -1,13 +1,13 @@
 ---
-title: "Couples Therapy in Lahore: When Is It Time to Seek Relationship Counselling?"
-seoTitle: "Couples Therapy in Lahore: When Should Couples Seek Help?"
-description: "Considering couples therapy in Lahore? Learn when relationship counselling may help with communication, recurring arguments, trust, distance, and relationship difficulties."
-date: "2026-09-04"
-category: "Couples Therapy"
-image: "/images/blog/couples-therapy-lahore.webp"
-author: "Ambreen Rashid Khan"
-status: "draft"
-primaryKeyword: "couples therapy Lahore"
+title: 'Couples Therapy in Lahore: When Is It Time to Seek Relationship Counselling?'
+image: '/images/blog/couples-therapy-lahore.webp'
+status: published
+date: 2026-09-04T00:00:00.000Z
+category: Couples Therapy
+author: Ambreen Rashid Khan
+seoTitle: 'Couples Therapy in Lahore: When Should Couples Seek Help?'
+description: 'Considering couples therapy in Lahore? Learn when relationship counselling may help with communication, recurring arguments, trust, distance, and relationship difficulties.'
+primaryKeyword: couples therapy Lahore
 ---
 
 Every relationship experiences conflict.
@@ -110,6 +110,6 @@ A healthier relationship does not necessarily begin when two people stop disagre
 
 ## Ready to take the next step?
 
-Visit www.ambreenrashidkhan.com to learn about in-person and online psychological therapy options.
+Visit [www.ambreenrashidkhan.com](http://www.ambreenrashidkhan.com) to learn about in-person and online psychological therapy options.
 
 This article is for general education and does not replace individualized psychological assessment or relationship therapy.

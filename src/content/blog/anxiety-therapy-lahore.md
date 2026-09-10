@@ -1,13 +1,13 @@
 ---
-title: "Anxiety Therapy in Lahore: When Worry Becomes More Than Everyday Stress"
-seoTitle: "Anxiety Therapy in Lahore: Symptoms, Causes & When to Get Help"
-description: "Looking for anxiety therapy in Lahore? Learn common anxiety symptoms, how anxiety affects everyday life, and when speaking with a psychologist may help."
-date: "2026-09-04"
-category: "Anxiety"
-image: "/images/blog/anxiety-therapy-lahore.webp"
-author: "Ambreen Rashid Khan"
-status: "draft"
-primaryKeyword: "anxiety therapy Lahore"
+title: 'Anxiety Therapy in Lahore: When Worry Becomes More Than Everyday Stress'
+image: '/images/blog/anxiety-therapy-lahore.webp'
+status: published
+date: 2026-09-04T00:00:00.000Z
+category: Anxiety
+author: Ambreen Rashid Khan
+seoTitle: 'Anxiety Therapy in Lahore: Symptoms, Causes & When to Get Help'
+description: 'Looking for anxiety therapy in Lahore? Learn common anxiety symptoms, how anxiety affects everyday life, and when speaking with a psychologist may help.'
+primaryKeyword: anxiety therapy Lahore
 ---
 
 Everyone worries.
@@ -106,6 +106,6 @@ If anxiety is beginning to control your decisions rather than simply appearing o
 
 ## Ready to take the next step?
 
-Visit www.ambreenrashidkhan.com to learn about in-person and online psychological therapy options.
+Visit [www.ambreenrashidkhan.com](http://www.ambreenrashidkhan.com) to learn about in-person and online psychological therapy options.
 
 This content is intended for general educational purposes and does not constitute diagnosis or individualized medical or psychological advice.

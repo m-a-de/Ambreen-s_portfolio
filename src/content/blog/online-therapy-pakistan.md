@@ -1,13 +1,13 @@
 ---
-title: "Online Therapy in Pakistan: How Does Online Counselling Work?"
-seoTitle: "Online Therapy in Pakistan: How Online Psychology Sessions Work"
-description: "Considering online therapy in Pakistan? Learn how online psychology sessions work, their benefits, what to expect, and whether online counselling may be right for you."
-date: "2026-09-04"
-category: "Online Therapy"
-image: "/images/blog/online-therapy-pakistan.webp"
-author: "Ambreen Rashid Khan"
-status: "draft"
-primaryKeyword: "online therapy Pakistan"
+title: 'Online Therapy in Pakistan: How Does Online Counselling Work?'
+image: '/images/blog/online-therapy-pakistan.webp'
+status: published
+date: 2026-09-04T00:00:00.000Z
+category: Online Therapy
+author: Ambreen Rashid Khan
+seoTitle: 'Online Therapy in Pakistan: How Online Psychology Sessions Work'
+description: 'Considering online therapy in Pakistan? Learn how online psychology sessions work, their benefits, what to expect, and whether online counselling may be right for you.'
+primaryKeyword: online therapy Pakistan
 ---
 
 Accessing psychological support no longer always requires travelling to a clinic.
@@ -116,6 +116,6 @@ The most important step is not whether you begin therapy from a psychologist's o
 
 ## Ready to take the next step?
 
-Visit www.ambreenrashidkhan.com to learn about in-person and online psychological therapy options.
+Visit [www.ambreenrashidkhan.com](http://www.ambreenrashidkhan.com) to learn about in-person and online psychological therapy options.
 
 This article contains general information only and is not a substitute for individual psychological, psychiatric, or medical advice.
