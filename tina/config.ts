@@ -2,16 +2,15 @@ import React from 'react';
 import { defineConfig, LocalAuthProvider, wrapFieldsWithMeta } from 'tinacms';
 
 const branch =
-  process.env.GITHUB_BRANCH ||
+  process.env.NEXT_PUBLIC_TINA_BRANCH ||
   process.env.VERCEL_GIT_COMMIT_REF ||
-  process.env.HEAD ||
+  process.env.GITHUB_BRANCH ||
   'main';
 
-const hasTinaCloudCredentials = Boolean(
-  process.env.NEXT_PUBLIC_TINA_CLIENT_ID && process.env.TINA_TOKEN
-);
+// Local `tinacms dev` and any non-Vercel machine stay on LocalAuthProvider,
+// even if TinaCloud env vars exist in .env. Vercel builds use TinaCloud.
 const isLocal =
-  process.env.TINA_PUBLIC_IS_LOCAL === 'true' || !hasTinaCloudCredentials;
+  process.env.TINA_PUBLIC_IS_LOCAL === 'true' || process.env.VERCEL !== '1';
 
 function slugifyTitle(title: string) {
   return title
@@ -145,6 +144,7 @@ export default defineConfig({
         defaultItem: () => ({
           author: 'Ambreen Rashid Khan',
           status: 'draft',
+          date: new Date().toISOString().slice(0, 10),
         }),
         ui: {
           filename: {

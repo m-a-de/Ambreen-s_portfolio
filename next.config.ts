@@ -29,10 +29,40 @@ const developmentContentSecurityPolicy = [
   "frame-ancestors 'self'",
 ].join("; ");
 
-const contentSecurityPolicy =
-  process.env.NODE_ENV === "development"
-    ? developmentContentSecurityPolicy
-    : productionContentSecurityPolicy;
+const productionAdminContentSecurityPolicy = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://images.unsplash.com https://www.google-analytics.com https://*.google-analytics.com https://assets.tina.io https://assets.tinajs.io https://*.tina.io https://s3.us-east-1.amazonaws.com",
+  "font-src 'self' data:",
+  "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://challenges.cloudflare.com https://identity.tinajs.io https://identity-v2.tinajs.io https://content.tinajs.io https://assets.tinajs.io https://assets.tina.io https://*.tina.io https://s3.us-east-1.amazonaws.com",
+  "frame-src https://challenges.cloudflare.com",
+  "form-action 'self' https://identity.tinajs.io https://identity-v2.tinajs.io https://*.tina.io",
+  "worker-src 'self' blob:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "frame-ancestors 'self'",
+  "upgrade-insecure-requests",
+].join("; ");
+
+const sharedSecurityHeaders = [
+  {
+    key: "X-Frame-Options",
+    value: "SAMEORIGIN",
+  },
+  {
+    key: "X-Content-Type-Options",
+    value: "nosniff",
+  },
+  {
+    key: "Referrer-Policy",
+    value: "strict-origin-when-cross-origin",
+  },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+  },
+];
 
 const nextConfig: NextConfig = {
   images: {
@@ -44,32 +74,62 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  async headers() {
+  async rewrites() {
     return [
       {
-        source: "/(.*)",
+        source: "/admin",
+        destination: "/admin/index.html",
+      },
+    ];
+  },
+
+  async headers() {
+    const isDevelopment = process.env.NODE_ENV === "development";
+
+    if (isDevelopment) {
+      return [
+        {
+          source: "/(.*)",
+          headers: [
+            {
+              key: "Content-Security-Policy",
+              value: developmentContentSecurityPolicy,
+            },
+            ...sharedSecurityHeaders,
+          ],
+        },
+      ];
+    }
+
+    return [
+      {
+        source: "/admin",
         headers: [
           {
             key: "Content-Security-Policy",
-            value: contentSecurityPolicy,
+            value: productionAdminContentSecurityPolicy,
           },
+          ...sharedSecurityHeaders,
+        ],
+      },
+      {
+        source: "/admin/:path*",
+        headers: [
           {
-            key: "X-Frame-Options",
-            value: "SAMEORIGIN",
+            key: "Content-Security-Policy",
+            value: productionAdminContentSecurityPolicy,
           },
+          ...sharedSecurityHeaders,
+        ],
+      },
+      {
+        source: "/((?!admin(?:/|$)).*)",
+        headers: [
           {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
+            key: "Content-Security-Policy",
+            value: productionContentSecurityPolicy,
           },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-          {
-            key: "Permissions-Policy",
-            value:
-              "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
-          },
+          ...sharedSecurityHeaders,
         ],
       },
     ];

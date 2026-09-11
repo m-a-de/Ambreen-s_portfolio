@@ -41,6 +41,6 @@ yarn-error.log*
 next-env.d.ts
 content-source/
 
-# tina (local CMS only — do not deploy)
+# Tina generated files (created locally and on Vercel — do not commit)
 tina/__generated__/
 public/admin/

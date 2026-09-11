@@ -13,6 +13,7 @@ const PREFERRED_IMAGE_PREFIX = '/images/blog/';
 const DRY_RUN = process.argv.includes('--dry-run');
 const WEBP_QUALITY = 84;
 const MAX_WIDTH = 2000;
+const BLOG_GIT_PATHS = ['src/content/blog', 'public/images/blog'];
 
 const BLOCKED_PATHS = [
   'public/admin/',
@@ -58,6 +59,36 @@ function isSafeSlug(slug) {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(slug);
 }
 
+function normalizeRepoPath(filePath) {
+  return String(filePath || '')
+    .trim()
+    .replace(/\\/g, '/')
+    .replace(/^"(.*)"$/, '$1');
+}
+
+function isAllowedBlogPath(filePath) {
+  const normalized = normalizeRepoPath(filePath);
+  return ALLOWED_STAGE_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+}
+
+function isBlockedPath(filePath) {
+  const normalized = normalizeRepoPath(filePath);
+  return BLOCKED_PATHS.some((blocked) => {
+    if (blocked.endsWith('/')) {
+      return normalized === blocked.slice(0, -1) || normalized.startsWith(blocked);
+    }
+    return normalized === blocked || normalized.startsWith(`${blocked}/`);
+  });
+}
+
+function isPublishableArticlePath(filePath) {
+  const normalized = normalizeRepoPath(filePath);
+  if (!normalized.startsWith('src/content/blog/') || !normalized.endsWith('.md')) {
+    return false;
+  }
+  return isArticleFilename(path.posix.basename(normalized));
+}
+
 function publicPathFromImage(image) {
   if (!image.startsWith('/') || image.startsWith('//')) {
     return null;
@@ -85,6 +116,288 @@ function needsImageCleanup(image, slug) {
   return isRasterImage(image) || looksTemporaryFilename(image);
 }
 
+function emptyChangeSet() {
+  return {
+    added: [],
+    modified: [],
+    deleted: [],
+    renamed: [],
+  };
+}
+
+function sortUnique(values) {
+  return [...new Set(values)].sort((a, b) => a.localeCompare(b));
+}
+
+function parsePorcelainLine(line) {
+  if (!line) {
+    return null;
+  }
+
+  const xy = line.slice(0, 2);
+  const rest = line.slice(3);
+  if (!rest) {
+    return null;
+  }
+
+  if (rest.includes(' -> ')) {
+    const [fromRaw, toRaw] = rest.split(' -> ');
+    return {
+      xy,
+      path: normalizeRepoPath(toRaw),
+      from: normalizeRepoPath(fromRaw),
+      renamed: true,
+    };
+  }
+
+  return {
+    xy,
+    path: normalizeRepoPath(rest),
+    from: '',
+    renamed: false,
+  };
+}
+
+function classifyPorcelainEntry(entry, changes) {
+  if (!entry) {
+    return;
+  }
+
+  if (entry.renamed || entry.xy.includes('R')) {
+    changes.renamed.push({ from: entry.from, to: entry.path });
+    return;
+  }
+
+  if (entry.xy === '??' || entry.xy.includes('A')) {
+    changes.added.push(entry.path);
+    return;
+  }
+
+  if (entry.xy.includes('D')) {
+    changes.deleted.push(entry.path);
+    return;
+  }
+
+  changes.modified.push(entry.path);
+}
+
+function hasBlogChanges(changes) {
+  return (
+    changes.added.length > 0 ||
+    changes.modified.length > 0 ||
+    changes.deleted.length > 0 ||
+    changes.renamed.length > 0
+  );
+}
+
+function changePaths(changes) {
+  return sortUnique([
+    ...changes.added,
+    ...changes.modified,
+    ...changes.deleted,
+    ...changes.renamed.flatMap((item) => [item.from, item.to]),
+  ]);
+}
+
+function runGit(args, options = {}) {
+  return spawnSync('git', args, {
+    cwd: ROOT,
+    encoding: options.encoding || 'utf8',
+    stdio: options.stdio || 'pipe',
+    shell: false,
+  });
+}
+
+function gitStdout(args) {
+  const result = runGit(args);
+  if (result.status !== 0) {
+    const detail = String(result.stderr || result.stdout || '').trim();
+    throw Object.assign(new Error(`git ${args[0]} failed${detail ? `:\n${detail}` : '.'}`), {
+      step: `git ${args[0]}`,
+    });
+  }
+  return result.stdout || '';
+}
+
+function runGitCommand(args, label) {
+  console.log(`\n→ ${label}`);
+  const result = runGit(args, { stdio: 'inherit', encoding: 'utf8' });
+  if (result.status !== 0) {
+    throw Object.assign(new Error(`${label} failed with exit code ${result.status ?? 1}.`), {
+      step: label,
+    });
+  }
+}
+
+function npmScriptCommand(args) {
+  const script = args[0] === 'run' ? args[1] : args[0];
+  const extra = args[0] === 'run' ? args.slice(2).filter((part) => part !== '--') : args.slice(1);
+
+  if (script === 'lint') {
+    return [
+      process.execPath,
+      [path.join(ROOT, 'node_modules', 'eslint', 'bin', 'eslint.js'), ...extra],
+    ];
+  }
+
+  if (script === 'build') {
+    return [process.execPath, [path.join(ROOT, 'node_modules', 'next', 'dist', 'bin', 'next'), 'build', ...extra]];
+  }
+
+  throw new Error(`Unsupported npm script: ${script}`);
+}
+
+function runNpm(args, label) {
+  const [command, commandArgs] = npmScriptCommand(args);
+  console.log(`\n→ ${label}`);
+  const result = spawnSync(command, commandArgs, {
+    cwd: ROOT,
+    stdio: 'inherit',
+    shell: false,
+  });
+
+  if (result.status !== 0) {
+    throw Object.assign(new Error(`${label} failed with exit code ${result.status ?? 1}.`), {
+      step: label,
+    });
+  }
+}
+
+function gitCommitArgs(message) {
+  if (typeof message !== 'string' || !message.trim()) {
+    throw new Error('Commit message must be a non-empty string.');
+  }
+
+  return ['commit', '-m', message, '--', ...BLOG_GIT_PATHS];
+}
+
+function assertCommitMessageIsSingleArg(message) {
+  const args = gitCommitArgs(message);
+  const messageArg = args[2];
+
+  if (args[0] !== 'commit' || args[1] !== '-m') {
+    throw new Error('Git commit argv is malformed.');
+  }
+
+  if (messageArg !== message) {
+    throw new Error(`Commit message was split or mutated: ${JSON.stringify(args)}`);
+  }
+
+  if (args.indexOf(message) !== 2 || args.lastIndexOf(message) !== 2) {
+    throw new Error('Commit message must appear exactly once as a single argument.');
+  }
+
+  return args;
+}
+
+function getPorcelainChanges(gitPaths) {
+  const changes = emptyChangeSet();
+  const args =
+    gitPaths.length > 0
+      ? ['status', '--porcelain', '--', ...gitPaths]
+      : ['status', '--porcelain'];
+  const stdout = gitStdout(args);
+
+  for (const line of stdout.split(/\r?\n/)) {
+    classifyPorcelainEntry(parsePorcelainLine(line), changes);
+  }
+
+  changes.added = sortUnique(changes.added);
+  changes.modified = sortUnique(changes.modified);
+  changes.deleted = sortUnique(changes.deleted);
+  changes.renamed.sort((a, b) => a.to.localeCompare(b.to));
+  return changes;
+}
+
+function getBlogGitChanges() {
+  return getPorcelainChanges(BLOG_GIT_PATHS);
+}
+
+function getUnrelatedChanges() {
+  const changes = getPorcelainChanges([]);
+  const filterList = (files) => files.filter((file) => !isAllowedBlogPath(file));
+  return {
+    added: filterList(changes.added),
+    modified: filterList(changes.modified),
+    deleted: filterList(changes.deleted),
+    renamed: changes.renamed.filter((item) => !isAllowedBlogPath(item.to) || !isAllowedBlogPath(item.from)),
+  };
+}
+
+function mergeProposedConversions(changes, conversions) {
+  const next = {
+    added: [...changes.added],
+    modified: [...changes.modified],
+    deleted: [...changes.deleted],
+    renamed: [...changes.renamed],
+  };
+
+  for (const item of conversions) {
+    const articlePath = `src/content/blog/${item.slug}.md`;
+    const imagePath = `public/images/blog/${path.basename(item.to)}`;
+
+    if (!next.added.includes(articlePath) && !next.modified.includes(articlePath)) {
+      next.modified.push(articlePath);
+    }
+
+    if (!next.added.includes(imagePath) && !next.modified.includes(imagePath)) {
+      next.added.push(imagePath);
+    }
+  }
+
+  next.added = sortUnique(next.added);
+  next.modified = sortUnique(next.modified);
+  return next;
+}
+
+function printChangeGroups(changes) {
+  console.log('\nAdded:');
+  if (changes.added.length === 0) {
+    console.log('- none');
+  } else {
+    for (const file of changes.added) {
+      console.log(`+ ${file}`);
+    }
+  }
+
+  console.log('\nModified:');
+  if (changes.modified.length === 0) {
+    console.log('- none');
+  } else {
+    for (const file of changes.modified) {
+      console.log(`M ${file}`);
+    }
+  }
+
+  console.log('\nDeleted:');
+  if (changes.deleted.length === 0) {
+    console.log('- none');
+  } else {
+    for (const file of changes.deleted) {
+      console.log(`D ${file}`);
+    }
+  }
+
+  if (changes.renamed.length > 0) {
+    console.log('\nRenamed:');
+    for (const item of changes.renamed) {
+      console.log(`R ${item.from} -> ${item.to}`);
+    }
+  }
+}
+
+function printUnrelatedWarning(unrelated) {
+  if (!hasBlogChanges(unrelated)) {
+    return;
+  }
+
+  console.log('\nUnrelated changes that will NOT be staged:');
+  for (const file of unrelated.added) console.log(`+ ${file}`);
+  for (const file of unrelated.modified) console.log(`M ${file}`);
+  for (const file of unrelated.deleted) console.log(`D ${file}`);
+  for (const item of unrelated.renamed) console.log(`R ${item.from} -> ${item.to}`);
+}
+
 function readArticles() {
   if (!fs.existsSync(BLOG_DIR)) {
     throw new Error(`Missing blog directory: ${BLOG_DIR}`);
@@ -96,7 +409,7 @@ function readArticles() {
     .map((filename) => {
       const filePath = path.join(BLOG_DIR, filename);
       const raw = fs.readFileSync(filePath, 'utf8');
-      const { data } = matter(raw);
+      const { data, content } = matter(raw);
       const slug = filename.replace(/\.md$/i, '');
       return {
         filename,
@@ -112,6 +425,7 @@ function readArticles() {
         author: asString(data.author),
         status: parseStatus(data.status),
         primaryKeyword: asString(data.primaryKeyword),
+        body: asString(content),
       };
     });
 }
@@ -160,69 +474,51 @@ async function convertToWebp(sourcePath, destPath) {
   }
 }
 
-function runCommand(command, args, label) {
-  console.log(`\n→ ${label}`);
-  const result = spawnSync(command, args, {
-    cwd: ROOT,
-    stdio: 'inherit',
-    shell: process.platform === 'win32',
-  });
-
-  if (result.status !== 0) {
-    throw new Error(`${label} failed with exit code ${result.status ?? 1}.`);
-  }
-}
-
-function gitLines(args) {
-  const result = spawnSync('git', args, {
-    cwd: ROOT,
-    encoding: 'utf8',
-    shell: process.platform === 'win32',
-  });
-
-  if (result.status !== 0) {
-    throw new Error(`git ${args.join(' ')} failed.`);
-  }
-
-  return result.stdout
+function assertSafeGitState() {
+  const trackedBlocked = gitStdout(['ls-files', '--', ...BLOCKED_PATHS])
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter(Boolean);
+
+  if (trackedBlocked.length > 0) {
+    throw Object.assign(
+      new Error(`Blocked paths are tracked by Git. STOPPING.\n${trackedBlocked.join('\n')}`),
+      { step: 'Safety check' }
+    );
+  }
+
+  const stagedBlocked = gitStdout(['diff', '--cached', '--name-only', '--', ...BLOCKED_PATHS])
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (stagedBlocked.length > 0) {
+    throw Object.assign(
+      new Error(`Blocked paths are already staged. STOPPING.\n${stagedBlocked.join('\n')}`),
+      { step: 'Safety check' }
+    );
+  }
 }
 
-function assertSafeGitState() {
-  const trackedBlocked = gitLines(['ls-files', '--', ...BLOCKED_PATHS]);
-  if (trackedBlocked.length > 0) {
-    throw new Error(
-      `Blocked paths are tracked by Git. STOPPING.\n${trackedBlocked.join('\n')}`
-    );
-  }
-
-  const stagedBlocked = gitLines(['diff', '--cached', '--name-only', '--', ...BLOCKED_PATHS]);
-  if (stagedBlocked.length > 0) {
-    throw new Error(
-      `Blocked paths are already staged. STOPPING.\n${stagedBlocked.join('\n')}`
-    );
-  }
+function stagedNames() {
+  return gitStdout(['diff', '--cached', '--name-only'])
+    .split(/\r?\n/)
+    .map((line) => normalizeRepoPath(line))
+    .filter(Boolean);
 }
 
 function assertStagedFilesAreAllowed(stagedFiles) {
-  const unexpected = stagedFiles.filter(
-    (file) => !ALLOWED_STAGE_PREFIXES.some((prefix) => file.replace(/\\/g, '/').startsWith(prefix))
-  );
+  const unexpected = stagedFiles.filter((file) => !isAllowedBlogPath(file) || isBlockedPath(file));
 
   if (unexpected.length > 0) {
-    spawnSync('git', ['reset', 'HEAD', '--', ...unexpected], {
-      cwd: ROOT,
-      shell: process.platform === 'win32',
-    });
-    throw new Error(
-      `Refusing to continue. Unexpected files were staged:\n${unexpected.join('\n')}`
+    throw Object.assign(
+      new Error(`Refusing to continue. Unexpected files were staged:\n${unexpected.join('\n')}`),
+      { step: 'Stage blog files only' }
     );
   }
 }
 
-function validateArticles(published, drafts, allArticles) {
+function validateArticles(published) {
   const errors = [];
   const slugs = published.map((article) => article.slug);
   const duplicateSlugs = slugs.filter((slug, index) => slugs.indexOf(slug) !== index);
@@ -245,6 +541,7 @@ function validateArticles(published, drafts, allArticles) {
     if (!article.category) errors.push(`${article.slug} is missing category.`);
     if (!article.author) errors.push(`${article.slug} is missing author.`);
     if (!article.primaryKeyword) errors.push(`${article.slug} is missing primaryKeyword.`);
+    if (!article.body) errors.push(`${article.slug} is missing body content.`);
     if (!article.image) {
       errors.push(`${article.slug} is missing image.`);
       continue;
@@ -257,41 +554,38 @@ function validateArticles(published, drafts, allArticles) {
   }
 
   if (errors.length > 0) {
-    throw new Error(`Blog validation failed:\n- ${errors.join('\n- ')}`);
+    throw Object.assign(new Error(`Blog validation failed:\n- ${errors.join('\n- ')}`), {
+      step: 'Validation',
+    });
   }
-
-  return { published, drafts, allArticles };
 }
 
-function printSummary({
-  published,
-  drafts,
-  conversions,
-  lintPass,
-  buildPass,
-  gitFiles,
-}) {
-  console.log('\n========================================');
-  console.log('BLOGS READY TO PUBLISH');
-  console.log('========================================\n');
+function printDetectedChanges(changes, conversions, baseline) {
+  console.log('\nBLOG CHANGES DETECTED');
+  printChangeGroups(changes);
 
-  console.log('Published:');
-  for (const article of published) {
-    console.log(`- ${article.slug}`);
-  }
-
-  console.log('\nImages:');
-  for (const article of published) {
-    console.log(`- ${path.basename(article.image)}`);
+  if (baseline && hasBlogChanges(baseline)) {
+    console.log('\nThese include intentional Tina/local blog changes that were already present when publish started.');
   }
 
   if (conversions.length > 0) {
-    console.log('\nImage cleanup:');
+    console.log('\nImage cleanup from this publish run:');
     for (const item of conversions) {
       console.log(
-        `- ${item.slug}: ${item.from} → ${item.to}${item.dryRun ? ' (proposed)' : ''}`
+        `- ${item.slug}: ${item.from} → ${item.to}${item.dryRun ? ' (proposed, not written)' : ''}`
       );
     }
+  }
+}
+
+function printSummary({ published, drafts, conversions, lintPass, buildPass, changes, commitMessage }) {
+  console.log('\n====================================');
+  console.log('BLOGS READY TO PUBLISH');
+  console.log('====================================\n');
+
+  console.log('Published articles:');
+  for (const article of published) {
+    console.log(`- ${article.slug}`);
   }
 
   console.log('\nDrafts ignored:');
@@ -303,21 +597,36 @@ function printSummary({
     }
   }
 
-  console.log(`\nLint: ${lintPass ? 'PASS' : 'FAIL'}`);
-  console.log(`Build: ${buildPass ? 'PASS' : 'FAIL'}`);
+  console.log('\nBlog file changes:');
+  printChangeGroups(changes);
 
-  console.log('\nGit files to commit:');
-  if (gitFiles.length === 0) {
-    console.log('- none');
-  } else {
-    for (const file of gitFiles) {
-      console.log(`- ${file}`);
+  if (conversions.length > 0) {
+    console.log('\nImage cleanup:');
+    for (const item of conversions) {
+      console.log(
+        `- ${item.slug}: ${item.from} → ${item.to}${item.dryRun ? ' (proposed, not written)' : ''}`
+      );
     }
   }
 
-  if (DRY_RUN) {
-    console.log('\nDRY RUN: no files were changed, committed, or pushed.');
+  console.log(`\nLint: ${lintPass ? 'PASS' : 'FAIL'}`);
+  console.log(`Build: ${buildPass ? 'PASS' : 'FAIL'}`);
+
+  if (commitMessage) {
+    const args = assertCommitMessageIsSingleArg(commitMessage);
+    console.log('\nCommit message:');
+    console.log(commitMessage);
+    console.log('\nGit commit argv (spawnSync, shell: false):');
+    console.log(JSON.stringify(['git', ...args]));
+    console.log('Commit message argument count: 1');
   }
+
+  if (DRY_RUN) {
+    console.log('\nDRY RUN: no files were staged, committed, or pushed.');
+    console.log('DRY RUN: article files and images were not permanently modified.');
+  }
+
+  console.log('\n====================================');
 }
 
 async function processImages(published, allArticles) {
@@ -332,7 +641,9 @@ async function processImages(published, allArticles) {
 
     const sourceAbs = publicPathFromImage(article.image);
     if (!sourceAbs || !fs.existsSync(sourceAbs)) {
-      throw new Error(`${article.slug} image does not exist: ${article.image}`);
+      throw Object.assign(new Error(`${article.slug} image does not exist: ${article.image}`), {
+        step: 'Image conversion',
+      });
     }
 
     const destAbs = publicPathFromImage(preferred);
@@ -349,6 +660,7 @@ async function processImages(published, allArticles) {
       continue;
     }
 
+    fs.mkdirSync(IMAGE_DIR, { recursive: true });
     await convertToWebp(sourceAbs, destAbs);
 
     const nextRaw = replaceImageLine(article.raw, preferred);
@@ -368,48 +680,80 @@ async function processImages(published, allArticles) {
   return conversions;
 }
 
-function filesThatWouldBeStaged(conversions) {
-  const current = gitLines(['status', '--short', '--', 'src/content/blog', 'public/images/blog']);
-  const proposed = [];
-
-  for (const item of conversions) {
-    proposed.push(`public/images/blog/${path.basename(item.to)}`);
-    proposed.push(`src/content/blog/${item.slug}.md`);
-  }
-
-  return [...new Set([...current, ...proposed])];
-}
-
-async function confirmPublish() {
+async function confirm(question) {
   const rl = readline.createInterface({ input, output });
-  const answer = (await rl.question('\nPublish these blog changes to the live website? (y/N) '))
-    .trim()
-    .toLowerCase();
+  const answer = (await rl.question(`\n${question} `)).trim().toLowerCase();
   rl.close();
   return answer === 'y' || answer === 'yes';
 }
 
-function commitMessage(stagedFiles) {
-  const slugs = stagedFiles
-    .filter((file) => file.replace(/\\/g, '/').startsWith('src/content/blog/'))
-    .map((file) => path.basename(file, '.md'))
-    .filter((slug) => slug !== 'README' && !slug.startsWith('_'));
+function buildCommitMessage(changes) {
+  const addedArticles = changes.added.filter(isPublishableArticlePath);
+  const otherArticleChanges =
+    changes.modified.some(isPublishableArticlePath) ||
+    changes.deleted.some(isPublishableArticlePath) ||
+    changes.renamed.some((item) => isPublishableArticlePath(item.from) || isPublishableArticlePath(item.to));
 
-  if (slugs.length === 1) {
-    return `Publish blog: ${slugs[0]}`;
+  if (addedArticles.length === 1 && !otherArticleChanges) {
+    return `Publish blog: ${path.posix.basename(addedArticles[0], '.md')}`;
   }
+
   return 'Publish blog updates';
+}
+
+function testCommitMessageConstruction() {
+  const samples = [
+    'Publish blog updates',
+    'Publish blog: clinical-psychologist-in-lahore',
+    'Publish "Anxiety & Depression" article',
+  ];
+
+  for (const message of samples) {
+    assertCommitMessageIsSingleArg(message);
+  }
+
+  const sampleLine = parsePorcelainLine('M  src/content/blog/couples-therapy-lahore.md');
+  if (!sampleLine || sampleLine.path !== 'src/content/blog/couples-therapy-lahore.md') {
+    throw new Error('Porcelain modified-file parsing failed.');
+  }
+
+  console.log('\nCommit-message argument construction: PASS');
+  console.log('Verified single-argument messages:');
+  for (const message of samples) {
+    console.log(`- ${JSON.stringify(message)}`);
+  }
+}
+
+function reportCommitFailure() {
+  console.log('\n→ git status');
+  runGit(['status'], { stdio: 'inherit' });
+
+  const staged = stagedNames();
+  console.log('\nExactly what remains staged:');
+  if (staged.length === 0) {
+    console.log('- none');
+    return;
+  }
+
+  for (const file of staged) {
+    console.log(`- ${file}`);
+  }
 }
 
 async function main() {
   console.log(DRY_RUN ? 'Blog publish dry-run starting…' : 'Blog publish starting…');
+
+  const baseline = getBlogGitChanges();
+  const unrelated = getUnrelatedChanges();
 
   const allArticles = readArticles();
   const published = allArticles.filter((article) => article.status === 'published');
   const drafts = allArticles.filter((article) => article.status !== 'published');
 
   if (published.length === 0) {
-    throw new Error('No published articles found. Drafts were ignored.');
+    throw Object.assign(new Error('No published articles found. Drafts were ignored.'), {
+      step: 'Validation',
+    });
   }
 
   const conversions = await processImages(published, allArticles);
@@ -417,34 +761,33 @@ async function main() {
   const publishedAfter = refreshed.filter((article) => article.status === 'published');
   const draftsAfter = refreshed.filter((article) => article.status !== 'published');
 
-  validateArticles(publishedAfter, draftsAfter, refreshed);
+  validateArticles(publishedAfter);
+
+  let changes = getBlogGitChanges();
+  if (DRY_RUN && conversions.length > 0) {
+    changes = mergeProposedConversions(changes, conversions);
+  }
+
+  printDetectedChanges(changes, conversions, baseline);
+  printUnrelatedWarning(unrelated);
+
+  if (hasBlogChanges(changes) && !DRY_RUN) {
+    const continueConfirmed = await confirm('Continue with these blog changes? (y/N)');
+    if (!continueConfirmed) {
+      console.log('Cancelled. No files were staged, committed, or pushed.');
+      return;
+    }
+  }
 
   let lintPass = false;
   let buildPass = false;
 
-  runCommand('npm', ['run', 'lint', '--', '--quiet'], 'Lint');
+  runNpm(['run', 'lint', '--', '--quiet'], 'Lint');
   lintPass = true;
-  runCommand('npm', ['run', 'build'], 'Production build');
+  runNpm(['run', 'build'], 'Production build');
   buildPass = true;
 
-  if (DRY_RUN) {
-    printSummary({
-      published: publishedAfter,
-      drafts: draftsAfter,
-      conversions,
-      lintPass,
-      buildPass,
-      gitFiles: filesThatWouldBeStaged(conversions),
-    });
-    return;
-  }
-
-  assertSafeGitState();
-  runCommand('git', ['add', '--', 'src/content/blog', 'public/images/blog'], 'Stage blog files only');
-
-  const stagedFiles = gitLines(['diff', '--cached', '--name-only']);
-  assertStagedFilesAreAllowed(stagedFiles);
-  assertSafeGitState();
+  const message = hasBlogChanges(changes) ? buildCommitMessage(changes) : '';
 
   printSummary({
     published: publishedAfter,
@@ -452,37 +795,74 @@ async function main() {
     conversions,
     lintPass,
     buildPass,
-    gitFiles: stagedFiles,
+    changes,
+    commitMessage: message || 'Publish blog updates',
   });
 
-  if (stagedFiles.length === 0) {
+  if (DRY_RUN) {
+    testCommitMessageConstruction();
+    return;
+  }
+
+  if (!hasBlogChanges(changes)) {
     console.log('\nNothing new to commit. Live site is already up to date for blog files.');
     return;
   }
 
-  const confirmed = await confirmPublish();
-  if (!confirmed) {
-    spawnSync('git', ['reset', 'HEAD', '--', 'src/content/blog', 'public/images/blog'], {
-      cwd: ROOT,
-      shell: process.platform === 'win32',
-    });
-    console.log('Cancelled. No commit or push was made.');
+  const publishConfirmed = await confirm('Publish these blog changes to the live website? (y/N)');
+  if (!publishConfirmed) {
+    console.log('Cancelled. No files were staged, committed, or pushed.');
     return;
   }
 
-  const branch = gitLines(['rev-parse', '--abbrev-ref', 'HEAD'])[0];
+  const branch = gitStdout(['rev-parse', '--abbrev-ref', 'HEAD']).trim();
   if (branch !== 'main') {
-    throw new Error(`Refusing to push from branch "${branch}". Switch to main first.`);
+    throw Object.assign(new Error(`Refusing to push from branch "${branch}". Switch to main first.`), {
+      step: 'Branch check',
+    });
   }
 
-  runCommand('git', ['commit', '-m', commitMessage(stagedFiles)], 'Commit blog updates');
-  runCommand('git', ['push', 'origin', 'main'], 'Push to origin/main');
+  assertSafeGitState();
+  runGitCommand(['add', '-A', '--', ...BLOG_GIT_PATHS], 'Stage blog files only');
+
+  const stagedFiles = stagedNames().filter(isAllowedBlogPath);
+  const stagedUnexpected = stagedNames().filter((file) => !isAllowedBlogPath(file));
+  if (stagedUnexpected.length > 0) {
+    console.log('\nWarning: unrelated files were already staged and were left untouched:');
+    for (const file of stagedUnexpected) {
+      console.log(`- ${file}`);
+    }
+  }
+
+  assertStagedFilesAreAllowed(stagedFiles);
+
+  if (stagedFiles.length === 0) {
+    console.log('\nNothing new to commit after staging blog paths.');
+    return;
+  }
+
+  const commitArgs = assertCommitMessageIsSingleArg(buildCommitMessage(changes));
+  try {
+    runGitCommand(commitArgs, 'Commit blog updates');
+  } catch (error) {
+    reportCommitFailure();
+    throw error;
+  }
+
+  try {
+    runGitCommand(['push', 'origin', 'main'], 'Push to origin/main');
+  } catch (error) {
+    console.error('\nPush failed. The local commit was kept.');
+    console.error('Nothing was reset.');
+    throw error;
+  }
 
   console.log('\nBlog changes pushed successfully.');
   console.log('Vercel deployment should now start automatically.');
 }
 
 main().catch((error) => {
-  console.error(`\nPublish stopped: ${error.message}`);
+  console.error(`\nPublish stopped at: ${error.step || 'publish'}`);
+  console.error(error.message);
   process.exit(1);
 });
