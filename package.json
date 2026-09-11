@@ -29,14 +29,14 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@tinacms/cli": "2.5.1",
+    "@tinacms/cli": "^2.7.0",
     "@types/node": "^20.19.43",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "tailwindcss": "^4",
-    "tinacms": "3.9.3",
+    "tinacms": "^3.13.0",
     "typescript": "^5"
   }
 }
