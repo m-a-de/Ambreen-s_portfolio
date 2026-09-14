@@ -7,10 +7,7 @@ const branch =
   process.env.GITHUB_BRANCH ||
   'main';
 
-// Local `tinacms dev` and any non-Vercel machine stay on LocalAuthProvider,
-// even if TinaCloud env vars exist in .env. Vercel builds use TinaCloud.
-const isLocal =
-  process.env.TINA_PUBLIC_IS_LOCAL === 'true' || process.env.VERCEL !== '1';
+const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true';
 
 function slugifyTitle(title: string) {
   return title
