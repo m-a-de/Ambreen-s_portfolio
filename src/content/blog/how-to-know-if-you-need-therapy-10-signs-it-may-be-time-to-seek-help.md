@@ -1,5 +1,6 @@
 ---
 title: 'How to Know If You Need Therapy: 10 Signs It May Be Time to Seek Help'
+image: '/images/blog/ChatGPT-Image-Sep-14,-2026,-06_59_37-AM.png'
 status: published
 date: 2026-09-14T00:00:00.000Z
 category: Anxiety
@@ -17,7 +18,7 @@ You may find yourself asking: "Do I really need therapy?"
 
 There is no single answer that applies to everyone. You do not have to wait until your situation becomes overwhelming before seeking professional support. Therapy can also be useful when you simply want a safe, structured space to understand yourself, improve relationships, develop healthier coping strategies, or work through a difficult experience.
 
-Here are ten signs that speaking with a mental health professional may be worth considering. 
+Here are ten signs that speaking with a mental health professional may be worth considering.
 
 ## 1. You Feel Overwhelmed Most of the Time
 
@@ -27,7 +28,7 @@ Occasional stress is normal. The concern is when feeling overwhelmed becomes per
 
 ## 2. Anxiety Is Interfering With Your Life
 
-Worry is a normal human experience. [Anxiety ](https://www.ambreenrashidkhan.com/#contact)becomes more concerning when it persists, occurs across different situations, or becomes increasingly difficult to manage.
+Worry is a normal human experience. [Anxiety ](https://www.ambreenrashidkhan.com#contact)becomes more concerning when it persists, occurs across different situations, or becomes increasingly difficult to manage.
 
 You might constantly anticipate something going wrong, avoid certain situations, struggle to relax, or experience physical symptoms such as restlessness or difficulty sleeping.
 
@@ -175,4 +176,4 @@ If you are considering therapy, a conversation with a qualified clinical psychol
 
 Ambreen Rashid Khan provides psychological support through individual therapy, couples therapy, trauma-informed care, and online sessions.
 
-[Book a consultation ](https://www.ambreenrashidkhan.com/#contact)to discuss your needs and explore whether therapy may be right for you.
+[Book a consultation ](https://www.ambreenrashidkhan.com#contact)to discuss your needs and explore whether therapy may be right for you.
