@@ -19,7 +19,10 @@ const NAV_ITEMS = [
 export default function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-  const contactHref = pathname === '/' || pathname.startsWith('/blog') ? '#contact' : '/#contact';
+  const contactHref =
+    pathname === '/' || pathname.startsWith('/blog') || pathname.startsWith('/services/')
+      ? '#contact'
+      : '/#contact';
 
   const closeMobileMenu = () => setMobileOpen(false);
 
