@@ -24,6 +24,7 @@ import {
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import ContactSection from '@/components/ContactSection';
+import BlogCoverImage from '@/components/BlogCoverImage';
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -504,29 +505,41 @@ My approach is grounded in trauma-informed care and motivational interviewing, w
                 {
                   href: '/blog/clinical-psychologist-in-lahore',
                   title: 'Clinical Psychologist in Lahore',
+                  image: '/images/blog/clinical-psychologist-in-lahore.webp',
                 },
                 {
                   href: '/blog/psychologist-in-lahore',
                   title: 'Psychologist in Lahore: How to Choose the Right Professional',
+                  image: '/images/blog/psychologist-in-lahore.webp',
                 },
                 {
                   href: '/blog/online-therapy-pakistan',
                   title: 'Online Therapy in Pakistan',
+                  image: '/images/blog/online-therapy-pakistan.webp',
                 },
               ].map((article) => (
                 <li key={article.href}>
-                  <article className="flex h-full flex-col rounded-xl border border-[#E8DED1] bg-[#FBF8F1] p-6 shadow-[0_1px_6px_rgba(18,63,56,0.04)] transition-colors hover:border-[#C8A675]/50">
-                    <h3 className="font-serif text-xl font-semibold leading-snug text-[#123F38]">
-                      <Link href={article.href} className="transition-colors hover:text-[#064F45]">
-                        {article.title}
+                  <article className="flex h-full flex-col overflow-hidden rounded-xl border border-[#E8DED1] bg-[#FBF8F1] shadow-[0_1px_6px_rgba(18,63,56,0.04)] transition-colors hover:border-[#C8A675]/50">
+                    <BlogCoverImage
+                      src={article.image}
+                      alt={article.title}
+                      hasImage
+                      sizes="(max-width: 1024px) 100vw, 33vw"
+                      className="h-48 w-full"
+                    />
+                    <div className="flex flex-1 flex-col p-6">
+                      <h3 className="font-serif text-xl font-semibold leading-snug text-[#123F38]">
+                        <Link href={article.href} className="transition-colors hover:text-[#064F45]">
+                          {article.title}
+                        </Link>
+                      </h3>
+                      <Link
+                        href={article.href}
+                        className="mt-5 inline-flex text-[13px] font-semibold text-[#064F45] transition-colors hover:text-[#05443B]"
+                      >
+                        Read article
                       </Link>
-                    </h3>
-                    <Link
-                      href={article.href}
-                      className="mt-5 inline-flex text-[13px] font-semibold text-[#064F45] transition-colors hover:text-[#05443B]"
-                    >
-                      Read article
-                    </Link>
+                    </div>
                   </article>
                 </li>
               ))}
