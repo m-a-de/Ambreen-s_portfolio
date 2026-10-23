@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
+import ContactSection from '@/components/ContactSection';
 import BlogCoverImage from '@/components/BlogCoverImage';
 import { formatPostDate, formatReadingTime, getAllPosts } from '@/lib/blog';
 
@@ -99,7 +100,7 @@ export default function BlogPage() {
                 </p>
                 <div className="mt-8 flex flex-col items-center justify-center gap-3 min-[400px]:flex-row">
                   <Link
-                    href="/#contact"
+                    href="#contact"
                     className="inline-flex items-center justify-center rounded-md bg-[#064F45] px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#05443B]"
                   >
                     Book a Session
@@ -115,6 +116,8 @@ export default function BlogPage() {
             )}
           </div>
         </section>
+
+        <ContactSection />
       </main>
 
       <SiteFooter />

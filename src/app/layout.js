@@ -2,6 +2,7 @@ import { DM_Serif_Display, Inter } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import BackToTop from "../components/BackToTop";
 import SmoothScroll from "../components/SmoothScroll";
+import WhatsAppButton from "../components/WhatsAppButton";
 import "./globals.css";
 
 const dmSerif = DM_Serif_Display({
@@ -47,6 +48,7 @@ export default function RootLayout({ children }) {
         {children}
 
         <SmoothScroll />
+        <WhatsAppButton />
         <BackToTop />
         <GoogleAnalytics gaId="G-0PE7FFMVGP" />
       </body>
