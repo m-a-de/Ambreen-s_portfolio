@@ -682,10 +682,10 @@ My approach is grounded in trauma-informed care and motivational interviewing, w
                   <div>
                     <p className="text-[11px] font-semibold tracking-[0.18em] text-[#064F45] uppercase">Phone</p>
                     <a
-                      href="tel:+923335515445"
+                      href="tel:+923086522764"
                       className="mt-1 block text-[15px] text-[#123F38] transition-colors hover:text-[#064F45]"
                     >
-                      +92 333 5515445
+                      +92 308 6522764
                     </a>
                   </div>
                 </li>
@@ -694,12 +694,12 @@ My approach is grounded in trauma-informed care and motivational interviewing, w
                   <div>
                     <p className="text-[11px] font-semibold tracking-[0.18em] text-[#064F45] uppercase">WhatsApp</p>
                     <a
-                      href="https://wa.me/923335515445"
+                      href="https://wa.me/923086522764"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mt-1 block text-[15px] text-[#123F38] transition-colors hover:text-[#064F45]"
                     >
-                      +92 333 5515445
+                      +92 308 6522764
                     </a>
                   </div>
                 </li>
@@ -900,7 +900,7 @@ My approach is grounded in trauma-informed care and motivational interviewing, w
       <SiteFooter />
 
       <a
-        href="https://wa.me/923335515445"
+        href="https://wa.me/923086522764"
         target="_blank"
         rel="noopener noreferrer"
         className="float-pop-loop fixed bottom-5 left-4 z-50 flex h-12 w-12 items-center justify-center rounded-[12px] border border-[#C8A675]/50 bg-[#FFFCF7] shadow-[0_4px_14px_rgba(18,63,56,0.12)] transition-colors hover:bg-[#EEF5EF] md:bottom-6 md:left-6 md:h-14 md:w-14"

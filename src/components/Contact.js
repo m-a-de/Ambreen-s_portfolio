@@ -125,7 +125,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-700 text-sm">Phone</p>
-                  <p className="text-gray-900">+92 333 5515445</p>
+                  <p className="text-gray-900">+92 308 6522764</p>
                 </div>
               </div>
               

@@ -39,13 +39,13 @@ export default function SiteHeader() {
             Online Sessions Across Pakistan &amp; Worldwide
           </p>
           <a
-            href="https://wa.me/923335515445"
+            href="https://wa.me/923086522764"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex shrink-0 items-center gap-2 tracking-wide transition-colors hover:text-[#C8A675]"
           >
             <FaWhatsapp className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>+92 333 5515445</span>
+            <span>+92 308 6522764</span>
           </a>
         </div>
       </div>

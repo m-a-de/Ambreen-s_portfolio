@@ -114,13 +114,13 @@ export default function SiteFooter() {
               </a>
             </li>
             <li>
-              <a href="tel:+923335515445" className="transition-colors hover:text-[#C8A675]">
-                +92 333 5515445
+              <a href="tel:+923086522764" className="transition-colors hover:text-[#C8A675]">
+                +92 308 6522764
               </a>
             </li>
             <li>
               <a
-                href="https://wa.me/923335515445"
+                href="https://wa.me/923086522764"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 transition-colors hover:text-[#C8A675]"
