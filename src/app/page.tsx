@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   Brain,
   BrainCog,
@@ -483,6 +484,65 @@ My approach is grounded in trauma-informed care and motivational interviewing, w
       </section>
 
       <div id="resources" className="scroll-mt-[124px]">
+        <section className="bg-[#FFFCF7] py-16 md:py-20" aria-labelledby="helpful-resources-heading">
+          <div className="mx-auto max-w-[1210px] px-5 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-3xl text-center">
+              <h2
+                id="helpful-resources-heading"
+                className="font-serif text-3xl font-semibold text-[#123F38] md:text-4xl"
+              >
+                Helpful Resources
+              </h2>
+              <p className="mt-5 text-[15px] leading-relaxed text-[#525B57] lg:text-base">
+                Practical guidance on therapy, mental health, and finding the right psychological
+                support in Lahore and Pakistan.
+              </p>
+            </div>
+
+            <ul className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-3">
+              {[
+                {
+                  href: '/blog/clinical-psychologist-in-lahore',
+                  title: 'Clinical Psychologist in Lahore',
+                },
+                {
+                  href: '/blog/psychologist-in-lahore',
+                  title: 'Psychologist in Lahore: How to Choose the Right Professional',
+                },
+                {
+                  href: '/blog/online-therapy-pakistan',
+                  title: 'Online Therapy in Pakistan',
+                },
+              ].map((article) => (
+                <li key={article.href}>
+                  <article className="flex h-full flex-col rounded-xl border border-[#E8DED1] bg-[#FBF8F1] p-6 shadow-[0_1px_6px_rgba(18,63,56,0.04)] transition-colors hover:border-[#C8A675]/50">
+                    <h3 className="font-serif text-xl font-semibold leading-snug text-[#123F38]">
+                      <Link href={article.href} className="transition-colors hover:text-[#064F45]">
+                        {article.title}
+                      </Link>
+                    </h3>
+                    <Link
+                      href={article.href}
+                      className="mt-5 inline-flex text-[13px] font-semibold text-[#064F45] transition-colors hover:text-[#05443B]"
+                    >
+                      Read article
+                    </Link>
+                  </article>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-8 text-center">
+              <Link
+                href="/blog"
+                className="inline-flex items-center justify-center rounded-md bg-[#064F45] px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#05443B]"
+              >
+                View All Articles
+              </Link>
+            </div>
+          </div>
+        </section>
+
         <section id="faq" className="scroll-mt-[124px] bg-[#FBF8F1] py-16 md:py-20">
           <div className="mx-auto max-w-[1210px] px-5 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
