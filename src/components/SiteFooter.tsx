@@ -12,11 +12,10 @@ const QUICK_LINKS = [
 ] as const;
 
 const SERVICE_LINKS = [
-  { label: 'Individual Therapy', href: '/#services' },
-  { label: 'Couples Therapy', href: '/#services' },
-  { label: 'Group Therapy', href: '/#services' },
-  { label: 'Clinical Supervision', href: '/#services' },
-  { label: 'Clinical Psychologist in Lahore', href: '/services/clinical-psychologist-lahore' },
+  'Individual Therapy',
+  'Couples Therapy',
+  'Group Therapy',
+  'Clinical Supervision',
 ] as const;
 
 export default function SiteFooter() {
@@ -88,13 +87,13 @@ export default function SiteFooter() {
             Services
           </h2>
           <ul className="mt-5 space-y-2.5">
-            {SERVICE_LINKS.map((item) => (
-              <li key={item.label}>
+            {SERVICE_LINKS.map((label) => (
+              <li key={label}>
                 <Link
-                  href={item.href}
+                  href="/#services"
                   className="text-sm text-[#FFFCF7]/80 transition-colors hover:text-[#C8A675]"
                 >
-                  {item.label}
+                  {label}
                 </Link>
               </li>
             ))}

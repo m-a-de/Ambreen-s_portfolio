@@ -271,8 +271,6 @@ Appointments are available in Shadman 2, Lahore, with online sessions available 
 
 If you are considering therapy, you can arrange an initial consultation to discuss your concerns and determine appropriate next steps.
 
-Learn more about [in-person and online psychological therapy in Lahore](/services/clinical-psychologist-lahore).
-
 Book a Psychological Consultation
 
 This article provides general educational information and is not a substitute for individualized psychological or medical assessment. If you believe you or someone else is in immediate danger, contact appropriate emergency services or urgent medical support
