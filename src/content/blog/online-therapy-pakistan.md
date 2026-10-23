@@ -116,6 +116,6 @@ The most important step is not whether you begin therapy from a psychologist's o
 
 ## Ready to take the next step?
 
-Visit [www.ambreenrashidkhan.com](http://www.ambreenrashidkhan.com) to learn about in-person and online psychological therapy options.
+Visit [www.ambreenrashidkhan.com](/) to learn about in-person and online psychological therapy options.
 
 This article contains general information only and is not a substitute for individual psychological, psychiatric, or medical advice.

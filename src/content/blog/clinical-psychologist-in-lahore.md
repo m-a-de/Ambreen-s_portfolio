@@ -99,7 +99,7 @@ People may begin withdrawing socially or criticizing themselves more harshly.
 
 If low mood is persistent or is affecting your ability to function, speaking with a mental health professional can help you understand what may be contributing to the problem and what type of support may be appropriate.
 
-For more information, read: Depression Therapy in Lahore: Understanding the Signs and When to Seek Help.
+For more information, read: [Depression Therapy in Lahore: Understanding the Signs and When to Seek Help](/blog/depression-therapy-lahore).
 
 ## Trauma and the Impact of Past Experiences
 
@@ -119,7 +119,7 @@ The therapeutic process should respect the person’s pace rather than forcing t
 
 Ambreen Rashid Khan’s clinical approach incorporates a trauma-informed model together with motivational interviewing techniques, allowing therapy to be adapted to each person’s circumstances, concerns, and goals.
 
-You can learn more in: Trauma Therapy: How Past Experiences Can Affect Your Present Life.
+You can learn more in: [Trauma Therapy: How Past Experiences Can Affect Your Present Life](/blog/trauma-therapy-lahore).
 
 ## Relationship Difficulties and Couples Therapy
 
@@ -135,7 +135,7 @@ Sometimes a couple repeatedly argues about different subjects while the underlyi
 
 Understanding that pattern can be an important part of making meaningful changes.
 
-Read more in: Couples Therapy: When Is It Time to Seek Relationship Counselling?
+Read more in: [Couples Therapy: When Is It Time to Seek Relationship Counselling?](/blog/couples-therapy-lahore).
 
 ## Online Therapy in Pakistan
 
@@ -153,7 +153,7 @@ Neither option is automatically better for every person.
 
 The appropriate format depends on your preferences, circumstances, and therapeutic needs.
 
-Read more in: Online Therapy in Pakistan: How Does Online Counselling Work?
+Read more in: [Online Therapy in Pakistan: How Does Online Counselling Work?](/blog/online-therapy-pakistan).
 
 ## What Happens During the First Therapy Session?
 
@@ -215,7 +215,7 @@ A psychologist may have appropriate professional experience, but therapy still n
 
 A first consultation is often the best way to evaluate that fit.
 
-For a detailed guide, read: Looking for a Psychologist in Lahore? Here’s How to Choose the Right One.
+For a detailed guide, read: [Looking for a Psychologist in Lahore? Here’s How to Choose the Right One](/blog/psychologist-in-lahore).
 
 ## Is Seeing a Psychologist a Sign That Something Is Seriously Wrong?
 

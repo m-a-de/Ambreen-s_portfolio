@@ -96,9 +96,9 @@ export default function Home() {
             </div>
 
             <h1 className="mt-5 font-serif text-[40px] font-semibold leading-[1.12] text-[#123F38] lg:text-[56px] lg:leading-[1.1]">
-              Empowering Change
+              Clinical Psychologist in Lahore
               <span className="mt-1 block font-semibold text-[#064F45]">
-                for a Happier, Authentic Life
+                Compassionate Support for Meaningful Change
               </span>
             </h1>
 
