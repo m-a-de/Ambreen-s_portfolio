@@ -11,10 +11,24 @@ import {
   SITE_URL,
   formatPostDate,
   formatReadingTime,
+  getAllPosts,
   getAllPostSlugs,
   getPostBySlug,
   type BlogPost,
 } from '@/lib/blog';
+
+function getRelatedPosts(current: BlogPost, limit = 3): BlogPost[] {
+  const others = getAllPosts().filter((post) => post.slug !== current.slug);
+  const currentCategory = current.category.trim().toLowerCase();
+  const sameCategory = currentCategory
+    ? others.filter((post) => post.category.trim().toLowerCase() === currentCategory)
+    : [];
+  const otherCategory = others.filter(
+    (post) => !currentCategory || post.category.trim().toLowerCase() !== currentCategory
+  );
+
+  return [...sameCategory, ...otherCategory].slice(0, limit);
+}
 
 function serializeJsonLd(data: unknown): string {
   return JSON.stringify(data).replace(/</g, '\\u003c');
@@ -140,6 +154,7 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
   }
 
   const { blogPosting, breadcrumb } = getArticleJsonLd(post);
+  const relatedPosts = getRelatedPosts(post);
 
   return (
     <div className="flex min-h-screen flex-col bg-[#FFFCF7]">
@@ -245,6 +260,53 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
                 {post.content}
               </ReactMarkdown>
             </div>
+
+            {relatedPosts.length > 0 && (
+              <section className="mt-14" aria-labelledby="related-articles-heading">
+                <h2
+                  id="related-articles-heading"
+                  className="font-serif text-2xl font-semibold text-[#123F38]"
+                >
+                  Related Articles
+                </h2>
+                <ul className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  {relatedPosts.map((related) => (
+                    <li key={related.slug}>
+                      <article className="flex h-full flex-col overflow-hidden rounded-xl border border-[#E8DED1] bg-[#FBF8F1]">
+                        <BlogCoverImage
+                          src={related.image}
+                          alt={related.title}
+                          hasImage={related.hasImage}
+                          sizes="(max-width: 1024px) 100vw, 33vw"
+                          className="h-36 w-full"
+                        />
+                        <div className="flex flex-1 flex-col p-5">
+                          <h3 className="font-serif text-lg font-semibold leading-snug text-[#123F38]">
+                            <Link
+                              href={`/blog/${related.slug}`}
+                              className="transition-colors hover:text-[#064F45]"
+                            >
+                              {related.title}
+                            </Link>
+                          </h3>
+                          {related.description && (
+                            <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-[#525B57]">
+                              {related.description}
+                            </p>
+                          )}
+                          <Link
+                            href={`/blog/${related.slug}`}
+                            className="mt-4 inline-flex text-[13px] font-semibold text-[#064F45] transition-colors hover:text-[#05443B]"
+                          >
+                            Read Article
+                          </Link>
+                        </div>
+                      </article>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
             <div className="mt-14 rounded-xl border border-[#E8DED1] bg-[#FBF8F1] px-6 py-8 text-center">
               <p className="font-serif text-2xl font-semibold text-[#123F38]">Need support?</p>
