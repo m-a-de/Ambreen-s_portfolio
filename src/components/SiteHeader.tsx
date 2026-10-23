@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
+import { trackEvent } from '@/lib/analytics';
 
 const NAV_ITEMS = [
   { label: 'Home', href: '/' },
@@ -43,6 +44,7 @@ export default function SiteHeader() {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex shrink-0 items-center gap-2 tracking-wide transition-colors hover:text-[#C8A675]"
+            onClick={() => trackEvent('whatsapp_click', { source: 'header' })}
           >
             <FaWhatsapp className="h-3.5 w-3.5" aria-hidden="true" />
             <span>+92 308 6522764</span>
@@ -79,6 +81,7 @@ export default function SiteHeader() {
             <a
               href={contactHref}
               className="float-pop-loop hidden rounded-md bg-[#064F45] px-5 py-2.5 text-[13px] font-semibold tracking-wide text-[#FFFCF7] shadow-[0_1px_4px_rgba(6,79,69,0.12)] transition-colors hover:bg-[#05443B] lg:inline-flex"
+              onClick={() => trackEvent('book_session_click', { source: 'header' })}
             >
               Book a Session
             </a>

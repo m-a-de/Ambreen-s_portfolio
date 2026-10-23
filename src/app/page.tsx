@@ -25,6 +25,7 @@ import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import ContactSection from '@/components/ContactSection';
 import BlogCoverImage from '@/components/BlogCoverImage';
+import { trackEvent } from '@/lib/analytics';
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -124,6 +125,7 @@ export default function Home() {
               <a
                 href="#contact"
                 className="inline-flex items-center justify-center rounded-md bg-[#064F45] px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#05443B]"
+                onClick={() => trackEvent('book_session_click', { source: 'homepage_hero' })}
               >
                 Book Your Session
               </a>

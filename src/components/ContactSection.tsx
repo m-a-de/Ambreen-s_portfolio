@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { CalendarDays, Clock, Mail, MapPin, Phone } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
+import { trackEvent } from '@/lib/analytics';
 
 export default function ContactSection() {
   const [contactForm, setContactForm] = useState({
@@ -72,6 +73,8 @@ export default function ContactSection() {
         throw new Error(data.error || 'Unable to send your message. Please try again later.');
       }
 
+      trackEvent('generate_lead', { lead_source: 'contact_form' });
+
       setContactStatus({
         submitted: true,
         success: true,
@@ -126,6 +129,7 @@ export default function ContactSection() {
                   <a
                     href="tel:+923086522764"
                     className="mt-1 block text-[15px] text-[#123F38] transition-colors hover:text-[#064F45]"
+                    onClick={() => trackEvent('phone_click', { source: 'contact_section' })}
                   >
                     +92 308 6522764
                   </a>
@@ -140,6 +144,7 @@ export default function ContactSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-1 block text-[15px] text-[#123F38] transition-colors hover:text-[#064F45]"
+                    onClick={() => trackEvent('whatsapp_click', { source: 'contact_section' })}
                   >
                     +92 308 6522764
                   </a>

@@ -7,6 +7,7 @@ import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import ContactSection from '@/components/ContactSection';
 import BlogCoverImage from '@/components/BlogCoverImage';
+import BookSessionLink from '@/components/BookSessionLink';
 import {
   SITE_URL,
   formatPostDate,
@@ -343,12 +344,13 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
 
             <div className="mt-14 rounded-xl border border-[#E8DED1] bg-[#FBF8F1] px-6 py-8 text-center">
               <p className="font-serif text-2xl font-semibold text-[#123F38]">Need support?</p>
-              <Link
+              <BookSessionLink
                 href="#contact"
+                source="blog_article"
                 className="mt-5 inline-flex items-center justify-center rounded-md bg-[#064F45] px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#05443B]"
               >
                 Book a Session
-              </Link>
+              </BookSessionLink>
             </div>
           </div>
         </article>
