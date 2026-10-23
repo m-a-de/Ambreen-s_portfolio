@@ -58,7 +58,7 @@ function getArticleJsonLd(post: BlogPost) {
     author: {
       '@type': 'Person',
       name: authorName,
-      url: `${SITE_URL}/`,
+      url: `${SITE_URL}/#about`,
     },
   };
 
@@ -208,7 +208,11 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
             </p>
 
             <div className="mt-6">
-              <p className="font-serif text-lg font-semibold text-[#123F38]">{post.author}</p>
+              <p className="font-serif text-lg font-semibold text-[#123F38]">
+                <Link href="/#about" className="transition-colors hover:text-[#064F45]">
+                  {post.author}
+                </Link>
+              </p>
               <p className="text-sm text-[#064F45]">Clinical Psychologist</p>
             </div>
 
@@ -260,6 +264,35 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
                 {post.content}
               </ReactMarkdown>
             </div>
+
+            <section
+              className="mt-14 rounded-xl border border-[#C8A675]/40 bg-[#FBF8F1] px-6 py-6"
+              aria-labelledby="about-the-author-heading"
+            >
+              <h2
+                id="about-the-author-heading"
+                className="font-serif text-2xl font-semibold text-[#123F38]"
+              >
+                About the Author
+              </h2>
+              <p className="mt-3 font-serif text-xl font-semibold text-[#123F38]">
+                Ambreen Rashid Khan
+              </p>
+              <p className="mt-1 text-sm text-[#064F45]">Clinical Psychologist</p>
+              <p className="mt-4 text-sm leading-relaxed text-[#525B57]">
+                Ambreen Rashid Khan is a Clinical Psychologist based in Lahore, providing
+                psychological support for adults experiencing emotional, behavioural, trauma-related
+                and relationship concerns. Her approach incorporates trauma-informed care and
+                motivational interviewing, with therapy tailored to each person&apos;s circumstances
+                and goals.
+              </p>
+              <Link
+                href="/#about"
+                className="mt-4 inline-flex text-[13px] font-semibold text-[#064F45] transition-colors hover:text-[#05443B]"
+              >
+                Learn more about Ambreen
+              </Link>
+            </section>
 
             {relatedPosts.length > 0 && (
               <section className="mt-14" aria-labelledby="related-articles-heading">
