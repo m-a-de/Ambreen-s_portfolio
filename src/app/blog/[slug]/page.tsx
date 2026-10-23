@@ -20,6 +20,17 @@ function serializeJsonLd(data: unknown): string {
   return JSON.stringify(data).replace(/</g, '\\u003c');
 }
 
+function toJsonLdDatePublished(date: string): string | undefined {
+  const isoDateTimeWithTimezone =
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
+
+  if (!isoDateTimeWithTimezone.test(date) || Number.isNaN(Date.parse(date))) {
+    return undefined;
+  }
+
+  return date;
+}
+
 function getArticleJsonLd(post: BlogPost) {
   const canonical = `${SITE_URL}/blog/${post.slug}`;
   const authorName = post.author || 'Ambreen Rashid Khan';
@@ -45,8 +56,9 @@ function getArticleJsonLd(post: BlogPost) {
     blogPosting.image = `${SITE_URL}${post.image}`;
   }
 
-  if (post.date) {
-    blogPosting.datePublished = post.date;
+  const datePublished = toJsonLdDatePublished(post.date);
+  if (datePublished) {
+    blogPosting.datePublished = datePublished;
   }
 
   const breadcrumb = {
