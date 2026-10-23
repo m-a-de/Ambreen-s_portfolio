@@ -13,7 +13,69 @@ import {
   formatReadingTime,
   getAllPostSlugs,
   getPostBySlug,
+  type BlogPost,
 } from '@/lib/blog';
+
+function serializeJsonLd(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, '\\u003c');
+}
+
+function getArticleJsonLd(post: BlogPost) {
+  const canonical = `${SITE_URL}/blog/${post.slug}`;
+  const authorName = post.author || 'Ambreen Rashid Khan';
+
+  const blogPosting: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    url: canonical,
+    mainEntityOfPage: canonical,
+    author: {
+      '@type': 'Person',
+      name: authorName,
+      url: `${SITE_URL}/`,
+    },
+  };
+
+  if (post.description) {
+    blogPosting.description = post.description;
+  }
+
+  if (post.hasImage) {
+    blogPosting.image = `${SITE_URL}${post.image}`;
+  }
+
+  if (post.date) {
+    blogPosting.datePublished = post.date;
+  }
+
+  const breadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: `${SITE_URL}/`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: `${SITE_URL}/blog`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: post.title,
+        item: canonical,
+      },
+    ],
+  };
+
+  return { blogPosting, breadcrumb };
+}
 
 type BlogArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -65,8 +127,18 @@ export default async function BlogArticlePage({ params }: BlogArticlePageProps) 
     notFound();
   }
 
+  const { blogPosting, breadcrumb } = getArticleJsonLd(post);
+
   return (
     <div className="flex min-h-screen flex-col bg-[#FFFCF7]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(blogPosting) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumb) }}
+      />
       <SiteHeader />
 
       <main className="flex-1">
